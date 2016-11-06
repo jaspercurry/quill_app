@@ -4,8 +4,8 @@ import './App.css';
 
 
 
-var stringOrig = "Elon Musk is a South African-born Canadian-American business magnate, investor, engineer, and inventor. Musk has stated that the goals of SolarCity, Tesla Motors, and SpaceX revolve around his vision to change the world"
-var stringMod = "Elon Musk is an South African-born Canadian-American business magnate investor engineer ans inventor. musk has stated that the goals of SolarCity, Tesla Motors, and SpaceX revolve around his vision too change the world"
+var stringOrig = "Elon Musk is a South African-born Canadian-American business magnate investor engineer and inventor. Musk has stated that the goals of SolarCity, Tesla Motors, and SpaceX revolve around his vision to change the world"
+var stringMod = "Elon Musk is an South African-born Canadian-American business magnate, investor, engineer, and inventor. musk has stated that the goals of SolarCity, Tesla Motors, and SpaceX revolve around his vision too change the world"
 // var stringOrig = "I am the very model of a modern Major-General, I've information vegetable, animal, and mineral, I know the kings of England, and I quote the fights historical, From Marathon to Waterloo, in order categorical.";
 // var stringMod = "I am the very model of a cartoon individual, My animation's comical, unusual, and whimsical, I'm quite adept at funny gags, comedic theory I have read, From wicked puns and stupid jokes to anvils that drop on your head.";
 
@@ -18,7 +18,7 @@ class App extends Component {
     var textDiff = diff.main(stringOrig, stringMod);
     var clean = diff.cleanupSemantic(textDiff)
     this.cleanDiff(textDiff)
-    console.log(textDiff);
+    // console.log(textDiff);
 
 
   }
@@ -36,7 +36,7 @@ class App extends Component {
           let added = diffArray[i+2][1]
           let original = removed + this.firstWord(diffArray[i + 3][1])
           let modified = added + this.firstWord(diffArray[i + 3][1])
-          index = stringOrig.split(" ").indexOf(original, index) // using this index of method with split means that this will not work for whole phrases - only single/partial words
+          index = stringOrig.split(" ").indexOf(original, index) // using this index of method with split means that this will not work for whole phrases - only single/partial words - used exclusivly for sequential comma detection
           finalArray.push({original: original, modified: modified, index: index, removed: removed, added: added })
         } else {
           let removed = diffArray[i+1][1]
@@ -76,24 +76,17 @@ class App extends Component {
     let combinedArray = []
 
     for (var i = 0; i < originalArray.length; i++) {
+      let adjacency = (originalArray[i + 1]) ? originalArray[i].index === originalArray[i + 1].index - 1 : false // need this logic because for the last element of the array, i + 1 is not defined.
+      let commadiff = originalArray[i].removed === "," || originalArray[i].added === ",";
 
-      if (originalArray[i].index === originalArray[i + 1].index - 1 && originalArray[i].removed === ",") {
-        debugger
-        while (originalArray[i].index === originalArray[i + 1].index - 1) {
-          originalArray[i + 1]
-          let combindedObject = {original: originalArray[i].original + " " + originalArray[i + 1].original, modified: originalArray[i].modified + " " + originalArray[i + 1].modified}
-
-          i += 1
-
-        }
-        let combindedObject = {original: originalArray[i].original + " " + originalArray[i + 1].original, modified: originalArray[i].modified + " " + originalArray[i + 1].modified}
-
-
+      if (adjacency && commadiff) {
+        originalArray[i + 1].original = originalArray[i].original + " " + originalArray[i + 1].original
+        originalArray[i + 1].modified = originalArray[i].modified + " " + originalArray[i + 1].modified
       } else {
-
+        combinedArray.push(originalArray[i])
       }
     }
-
+    console.log(combinedArray);
   }
 
   lastWord(string) {
