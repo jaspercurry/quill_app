@@ -35,21 +35,26 @@ export function diffText(stringOrig, stringMod) {
 
   function cleanDiff(diffArray) {
     let finalArray = []
-    for (var i = 0; i < diffArray.length; ) {
+    for (var i = 0; i < diffArray.length; i++ ) {
       let editType = diffArray[i][0] // will either be -1 (removal), 0 (no change), 1 (addition)
+      debugger
       switch (editType) {
         case -1:
+        debugger
           let rmDiffObject = removeText(diffArray, i)
           finalArray.push(rmDiffObject)
           i += rmDiffObject.countIncrease // the i count is increase by +1 or +2 depending on if the was followed by an addiion - should look into refactoring
           break;
+        case 0:
+        debugger
+          break
         case 1:
+        debugger
           let adDiffObject = addText(diffArray, i)
           finalArray.push(adDiffObject)
-          i++
           break
         default:
-          i++
+          break
         }
     }
     return arrayParser(finalArray)
@@ -68,30 +73,31 @@ export function diffText(stringOrig, stringMod) {
               var removed = diffArray[i][1]
               var added = diffArray[i + 1][1]
               var modified = diffArray[i+1][1]
-              var index = stringOrig.split(" ").indexOf(original, i) //used only for comma case
+              var index = stringOrig.split(" ").indexOf(original) //used only for comma case
           } else if ( priorEnd == " " ) { // tests for space at end of the preceeding word
               var original = diffArray[i][1] + firstWord(diffArray[i + 2][1])
               var removed = diffArray[i][1]
               var added = diffArray[i + 1][1]
               var modified = diffArray[i+1][1] + firstWord(diffArray[i + 2][1])
-              var index = stringOrig.split(" ").indexOf(original, i)
+              var index = stringOrig.split(" ").indexOf(original)
           } else if (followingStart == " ") { // tests for space at start of the following word
               var original = diffArray[i-1][1] + diffArray[i][1]
               var removed = diffArray[i][1]
               var added = diffArray[i +1 ][1]
               var modified = diffArray[i-1][1] + diffArray[i+1][1]
-              var index = stringOrig.split(" ").indexOf(original, i)
+              var index = stringOrig.split(" ").indexOf(original)
           } else {
             console.log("other - error!!");
           }
-          return {original, removed, added, modified, index, countIncrease: 2}
+          return {original, removed, added, modified, index, countIncrease: 1}
       } else { // text was only removed - simple logic assuming always removing from the end of a string (i.e. removal of comma)- needs to be built out to acomodate for different types of text removal (preceding space, folllowing space, both pre/post space, etc)
           var original = lastWord(diffArray[i-1][1]) + diffArray[i][1]
           var removed = diffArray[i][1].trim()
           var added = null
           var modified = lastWord(diffArray[i-1][1])
-          var index = stringOrig.split(" ").indexOf(original, i)
-          return {original, removed, added, modified, index, countIncrease: 1 }
+          var index = stringOrig.split(" ").indexOf(original)
+          debugger
+          return {original, removed, added, modified, index, countIncrease: 0 }
         }
       }
 
@@ -118,6 +124,7 @@ export function diffText(stringOrig, stringMod) {
         combinedArray.push(originalArray[i])
       }
     }
+    console.log(combinedArray);
     return combinedArray
   }
 
