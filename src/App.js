@@ -66,12 +66,8 @@ class App extends Component {
                 </div>
               <Table textDiff={this.props.textDiff} assignConcept={this.assignConcept}/>
               <button onClick={this.reset}>Reset</button>
-
             </div>
         }
-
-
-
       </div>
     );
   }
