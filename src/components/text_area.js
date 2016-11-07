@@ -9,47 +9,31 @@ import { bindActionCreators } from 'redux'
 class TextArea extends React.Component{
   constructor(props){
     super(props)
-    this.state = {value: ''}
+    this.state = {originalSubmit: true, modSumbit: true}
     this.handleChange = this.handleChange.bind(this)
-    this.fetchCompaniesAction = this.fetchCompaniesAction.bind(this)
   }
 
   handleChange(e) {
     e.preventDefault()
-    var tickers = [...this.props.companies, this.refs.ticker.value.toUpperCase()]
-    this.refs.ticker.value = ""
-    this.props.actions.setCompanies(tickers)
-    this.fetchCompaniesAction(tickers) // had issues with the setCompanies action - had to pass in tickers object to fetchCompaniesAction instead of calling on this.props.companies
-  }
-
-  fetchSubmitText(tickers) {
-    if (tickers.length > 0) {
-      var formattedTickers = tickers.join()
-      this.props.actions.fetchData(formattedTickers)
+    if (this.state.originalSubmit) {
+      this.props.originalText(this.refs.text.value)
+      this.setState({originalSubmit: false})
     }
-    setTimeout(() =>this.fetchCompaniesAction(this.props.companies), 60000); // refreshes stock data every minute - there is a bug that causes too many requests to me sent. Need to refactor.
+    if (this.state.originalSubmit === false) {
+      this.props.editedText(this.refs.text.value)
+    }
   }
-
 
   render(){
     return (
-    <div className='col-md-4'>
+    <div >
       <form onSubmit={this.handleChange}>
-      <input type='text' ref="ticker" placeholder='Ticker Symbol' />
+        <textarea ref="text" placeholder='Enter text here...' name="Text1" cols="80" rows="7"></textarea>
+        <br></br>
+        <input type="submit"/>
       </form>
   </div>)
   }
 }
 
-function mapStateToProps(state) {
-  return (
-    {companies: state.companies}
-  )
-}
-
-function mapDispatchToProps(dispatch) {
-  return { actions: bindActionCreators(actions, dispatch) }
-}
-
-const componentCreator = connect(mapStateToProps, mapDispatchToProps)
-export default componentCreator(StockSearch);
+export default TextArea;

@@ -6,10 +6,11 @@
     "react-scripts": "0.7.0"
   },
   "dependencies": {
-    "diff": "^3.0.1",
-    "diff_match_patch": "^0.1.1",
     "react": "^15.3.2",
-    "react-dom": "^15.3.2"
+    "react-dom": "^15.3.2",
+    "react-redux": "^4.4.5",
+    "redux": "^3.6.0",
+    "text-diff": "^1.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
