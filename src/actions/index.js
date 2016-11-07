@@ -73,7 +73,7 @@ export function diffText(stringOrig, stringMod) {
               var removed = diffArray[i][1]
               var added = diffArray[i + 1][1]
               var modified = diffArray[i+1][1]
-              var index = stringOrig.split(" ").indexOf(original) //used only for comma case
+              var index = stringOrig.split(" ").indexOf(original) //used only for comma case - need to accont for multiple occources 
           } else if ( priorEnd == " " ) { // tests for space at end of the preceeding word
               var original = diffArray[i][1] + firstWord(diffArray[i + 2][1])
               var removed = diffArray[i][1]
