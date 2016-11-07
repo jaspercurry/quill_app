@@ -7,6 +7,17 @@ export function assignConcept(concept, object) {
           }
 }
 
+export function clearDiffText() {
+  return { type: 'CLEAR_DIFF'
+          }
+
+ }
+
+export function clearConcept() {
+  return { type: 'CLEAR_CONCEPT'
+          }
+
+ }
 
 export function diffText(stringOrig, stringMod) {
 

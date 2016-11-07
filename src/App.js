@@ -6,7 +6,7 @@ import logo from './quill_logo.png';
 import './App.css';
 import TextArea from './components/text_area'
 import Table from './components/table'
-
+import TextContainer from './components/text_container'
 
 class App extends Component {
   constructor(props) {
@@ -15,11 +15,11 @@ class App extends Component {
     this.originalText = this.originalText.bind(this)
     this.editedText = this.editedText.bind(this)
     this.assignConcept = this.assignConcept.bind(this)
+    this.reset = this.reset.bind(this)
   }
 
   originalText(text) {
     this.setState({ original: text })
-
   }
 
   editedText(text) {
@@ -37,6 +37,12 @@ class App extends Component {
     this.props.actions.assignConcept(e.target.value, modObject)
   }
 
+  reset(){
+    this.setState({original: "", edited: ""})
+    this.props.actions.clearDiffText()
+    this.props.actions.clearConcept()
+  }
+
   render() {
     return (
       <div className="App">
@@ -44,21 +50,28 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h2>Welcome to my Quill App</h2>
         </div>
-        <TextArea originalText={this.originalText} editedText={this.editedText}/>
-          <div className="text">
-            <h2> Original:</h2>
-            {this.state.original}
-            <br></br>
-            <h2>Edited:</h2>
-            {this.state.edited}
+        {this.state.edited === "" ?
+          <div>
+          <TextArea originalText={this.originalText} editedText={this.editedText}/>
+
+          <br></br>
           </div>
-            <br></br>
-          <Table textDiff={this.props.textDiff} assignConcept={this.assignConcept}/>
-            <br></br>
-          <div className="text">
-            <h2>Differences:</h2>
-            {this.htmlDiv()}
-          </div>
+            :
+            <div>
+              <TextContainer title={"Original:"} text={this.state.original}/>
+              <TextContainer title={"Edited:"} text={this.state.edited}/>
+                <div className="text">
+                  <h2>Differences:</h2>
+                  {this.htmlDiv()}
+                </div>
+              <Table textDiff={this.props.textDiff} assignConcept={this.assignConcept}/>
+              <button onClick={this.reset}>Reset</button>
+
+            </div>
+        }
+
+
+
       </div>
     );
   }
