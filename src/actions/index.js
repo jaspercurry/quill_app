@@ -47,10 +47,25 @@ export function diffText(stringOrig, stringMod) {
     return arrayParser(processedDiffs)
   }
 
-  function removeOrAddText(stringMap, type) { // needs to be broken down into sub-functions
+  function buildStringMap(diffArray, i) {
+      let currentWord = diffArray[i][1]
+      let priorWord = (diffArray[i-1]) ? lastWord(diffArray[i-1][1]) : ""
+      let priorEndChar = (priorWord) ? priorWord.slice(-1) : "" // returns the last character from the string before, if it exists
+      let followingWord = (diffArray[i + 1]) ? firstWord(diffArray[i + 1][1]) : ""
+      let followingStartChar = (followingWord) ? followingWord.slice(0, 1) : "" //returns the first character of the following string, if it exists
+      let following2Word = (diffArray[i + 2]) ? firstWord(diffArray[i + 2][1]) : "" // returns the first word of one past the following string, if it exists - used when the immedatley following string is the addition text (not the following text)
+      let following2StartChar = (following2Word) ? following2Word.slice(0, 1) : "" //returns the first character of one past the following string, if it exists - used when the immedatley following string is the addition text (not the following text)
+      let currentStartingChar = diffArray[i][1].slice(0, 1) //returns the starting character of the current string
+      let currentEndingChar = diffArray[i][1].slice(-1) // returns the ending character of the current string
+      let followingItemType = (diffArray[i+1]) ? diffArray[i+1][0] : "" // returns the type of the folling item in the array, if it exists (-1 = subtraction, 0 = same, 1 = addition)
+
+      return { currentWord, priorWord, priorEndChar, followingWord, followingStartChar, following2Word, following2StartChar, currentStartingChar, currentEndingChar, followingItemType}
+    }
+
+  function removeOrAddText(stringMap, type) { // needs to be broken down into sub-functions; indexOf method is problematic if words are repeated (needs fundamental change in logic)
     var original, removed, added, modified, index
 
-    if (stringMap.priorEndChar === "" && stringMap.currentEndingChar === " ") { // removed or added an entire word - preceeding word ends in space, current string ends in space
+    if (stringMap.priorEndChar === "" && stringMap.currentEndingChar === " ") { // removed or added an entire word
         if (type === "added") {
           original = "N/A"
           added = stringMap.currentWord
@@ -70,7 +85,7 @@ export function diffText(stringOrig, stringMod) {
           modified = stringMap.followingWord
           index = stringOrig.split(" ").indexOf(original)
         }
-    } else if (stringMap.priorEndChar !== "" && stringMap.currentStartingChar !== " " && stringMap.currentEndingChar !==" " && stringMap.followingStartChar !== "" ) { // text was removed or added from middle of word - preceeding word ends with no space, current string starts with no space && current string ends with no space, following string ends with no space
+    } else if (stringMap.priorEndChar !== "" && stringMap.currentStartingChar !== " " && stringMap.currentEndingChar !==" " && stringMap.followingStartChar !== "" ) { // text was removed or added from middle of word
         if (type === "added") {
           original = stringMap.priorWord + stringMap.followingWord
           added = stringMap.currentWord
@@ -90,7 +105,7 @@ export function diffText(stringOrig, stringMod) {
           modified = stringMap.priorWord + stringMap.followingWord + stringMap.following2Word
           index = stringOrig.split(" ").indexOf(original)
         }
-    } else if (stringMap.priorEndChar !== "" && stringMap.currentStartingChar !== " " && stringMap.followingStartChar === "") { // text was removed or added from end of word - preceeding word ends with no space, current string starts with no space, following string starts with space
+    } else if (stringMap.priorEndChar !== "" && stringMap.currentStartingChar !== " " && stringMap.followingStartChar === "") { // text was removed or added from end of word
         if (type === "added") {
           original = stringMap.priorWord
           added = stringMap.currentWord
@@ -134,21 +149,6 @@ export function diffText(stringOrig, stringMod) {
       console.log("other - error #2"); // there are some edge cases with first and last words being added/removed + modifications to multiple parts of a single word
     }
     return {original, removed, added, modified, index}
-  }
-
-function buildStringMap(diffArray, i) {
-    let currentWord = diffArray[i][1]
-    let priorWord = (diffArray[i-1]) ? lastWord(diffArray[i-1][1]) : ""
-    let priorEndChar = (priorWord) ? priorWord.slice(-1) : "" // returns the last character from the string before, if it exists
-    let followingWord = (diffArray[i + 1]) ? firstWord(diffArray[i + 1][1]) : ""
-    let followingStartChar = (followingWord) ? followingWord.slice(0, 1) : "" //returns the first character of the following string, if it exists
-    let following2Word = (diffArray[i + 2]) ? firstWord(diffArray[i + 2][1]) : "" // returns the first word of one past the following string, if it exists - used when the immedatley following string is the addition text (not the following text)
-    let following2StartChar = (following2Word) ? following2Word.slice(0, 1) : "" //returns the first character of one past the following string, if it exists - used when the immedatley following string is the addition text (not the following text)
-    let currentStartingChar = diffArray[i][1].slice(0, 1) //returns the starting character of the current string
-    let currentEndingChar = diffArray[i][1].slice(-1) // returns the ending character of the current string
-    let followingItemType = (diffArray[i+1]) ? diffArray[i+1][0] : "" // returns the type of the folling item in the array, if it exists (-1 = subtraction, 0 = same, 1 = addition)
-
-    return { currentWord, priorWord, priorEndChar, followingWord, followingStartChar, following2Word, following2StartChar, currentStartingChar, currentEndingChar, followingItemType}
   }
 
   function arrayParser(originalArray) {
