@@ -62,92 +62,114 @@ export function diffText(stringOrig, stringMod) {
       return { currentWord, priorWord, priorEndChar, followingWord, followingStartChar, following2Word, following2StartChar, currentStartingChar, currentEndingChar, followingItemType}
     }
 
-  function removeOrAddText(stringMap, type) { // needs to be broken down into sub-functions; indexOf method is problematic if words are repeated (needs fundamental change in logic)
+  function removeOrAddText(stringMap, type) {
     var original, removed, added, modified, index
-
     if (stringMap.priorEndChar === "" && stringMap.currentEndingChar === " ") { // removed or added an entire word
-        if (type === "added") {
-          original = "N/A"
-          added = stringMap.currentWord
-          removed = null
-          modified = stringMap.currentWord
-          index = stringMod.split(" ").indexOf(modified)
-        } else if (type === "removed") {
-          original = stringMap.currentWord
-          added = null
-          removed = stringMap.currentWord
-          modified = "N/A"
-          index = stringOrig.split(" ").indexOf(original)
-        } else if (type === "replaced") {
-          original = stringMap.currentWord
-          added = stringMap.followingWord
-          removed = stringMap.currentWord
-          modified = stringMap.followingWord
-          index = stringOrig.split(" ").indexOf(original)
-        }
+        return modWholeWord(stringMap, type)
     } else if (stringMap.priorEndChar !== "" && stringMap.currentStartingChar !== " " && stringMap.currentEndingChar !==" " && stringMap.followingStartChar !== "" ) { // text was removed or added from middle of word
-        if (type === "added") {
-          original = stringMap.priorWord + stringMap.followingWord
-          added = stringMap.currentWord
-          removed = null
-          modified = stringMap.priorWord + stringMap.currentWord + stringMap.followingWord
-          index = stringMod.split(" ").indexOf(modified)
-        } else if (type === "removed") {
-          original = stringMap.priorWord + stringMap.currentWord + stringMap.followingWord
-          added = null
-          removed = stringMap.currentWord
-          modified = stringMap.priorWord + stringMap.followingWord
-          index = stringOrig.split(" ").indexOf(original)
-        } else if (type === "replaced") {
-          original = stringMap.priorWord + stringMap.currentWord + stringMap.following2Word
-          added = stringMap.followingWord
-          removed = stringMap.currentWord
-          modified = stringMap.priorWord + stringMap.followingWord + stringMap.following2Word
-          index = stringOrig.split(" ").indexOf(original)
-        }
+        return modMiddleWord(stringMap, type)
     } else if (stringMap.priorEndChar !== "" && stringMap.currentStartingChar !== " " && stringMap.followingStartChar === "") { // text was removed or added from end of word
-        if (type === "added") {
-          original = stringMap.priorWord
-          added = stringMap.currentWord
-          removed = null
-          modified = stringMap.priorWord + stringMap.currentWord
-          index = stringMod.split(" ").indexOf(modified)
-        } else if (type === "removed") {
-          original = stringMap.priorWord + stringMap.currentWord
-          added = null
-          removed = stringMap.currentWord
-          modified = stringMap.priorWord
-          index = stringOrig.split(" ").indexOf(original)
-        } else if (type === "replaced") {
-          original = stringMap.priorWord + stringMap.currentWord
-          added = stringMap.followingWord
-          removed = stringMap.currentWord
-          modified = stringMap.priorWord + stringMap.followingWord
-          index = stringOrig.split(" ").indexOf(original)
-        }
+        return modEndWord(stringMap, type)
     } else if (stringMap.priorEndChar === "" && stringMap.currentEndingChar !== " " && stringMap.followingStartChar !== "") { // text was removed or added to the start of word
-        if (type === "added") {
-          original = stringMap.followingWord
-          added = stringMap.currentWord
-          removed = null
-          modified = stringMap.currentWord + stringMap.followingWord
-          index = stringMod.split(" ").indexOf(modified)
-        } else if (type === "removed") {
-          original = stringMap.currentWord + stringMap.followingWord
-          added = null
-          removed = stringMap.currentWord
-          modified = stringMap.followingWord
-          index = stringOrig.split(" ").indexOf(original)
-        } else if (type === "replaced") {
-          original = stringMap.currentWord + stringMap.following2Word
-          added = stringMap.followingWord
-          removed = stringMap.currentWord
-          modified = stringMap.followingWord + stringMap.following2Word
-          index = stringOrig.split(" ").indexOf(original)
-        }
+        return modStartWord(stringMap, type)
     } else {
       console.log("other - error #2"); // there are some edge cases with first and last words being added/removed + modifications to multiple parts of a single word
     }
+  }
+
+  function modWholeWord(stringMap, type) {
+    let original, removed, added, modified, index
+      if (type === "added") {
+        original = "N/A"
+        added = stringMap.currentWord
+        removed = null
+        modified = stringMap.currentWord
+        index = stringMod.split(" ").indexOf(modified)
+      } else if (type === "removed") {
+        original = stringMap.currentWord
+        added = null
+        removed = stringMap.currentWord
+        modified = "N/A"
+        index = stringOrig.split(" ").indexOf(original)
+      } else if (type === "replaced") {
+        original = stringMap.currentWord
+        added = stringMap.followingWord
+        removed = stringMap.currentWord
+        modified = stringMap.followingWord
+        index = stringOrig.split(" ").indexOf(original)
+      }
+    return {original, removed, added, modified, index}
+  }
+
+  function modMiddleWord(stringMap, type) {
+    let original, removed, added, modified, index
+      if (type === "added") {
+        original = stringMap.priorWord + stringMap.followingWord
+        added = stringMap.currentWord
+        removed = null
+        modified = stringMap.priorWord + stringMap.currentWord + stringMap.followingWord
+        index = stringMod.split(" ").indexOf(modified)
+      } else if (type === "removed") {
+        original = stringMap.priorWord + stringMap.currentWord + stringMap.followingWord
+        added = null
+        removed = stringMap.currentWord
+        modified = stringMap.priorWord + stringMap.followingWord
+        index = stringOrig.split(" ").indexOf(original)
+      } else if (type === "replaced") {
+        original = stringMap.priorWord + stringMap.currentWord + stringMap.following2Word
+        added = stringMap.followingWord
+        removed = stringMap.currentWord
+        modified = stringMap.priorWord + stringMap.followingWord + stringMap.following2Word
+        index = stringOrig.split(" ").indexOf(original)
+      }
+    return {original, removed, added, modified, index}
+  }
+
+  function modEndWord(stringMap, type) {
+    let original, removed, added, modified, index
+      if (type === "added") {
+        original = stringMap.priorWord
+        added = stringMap.currentWord
+        removed = null
+        modified = stringMap.priorWord + stringMap.currentWord
+        index = stringMod.split(" ").indexOf(modified)
+      } else if (type === "removed") {
+        original = stringMap.priorWord + stringMap.currentWord
+        added = null
+        removed = stringMap.currentWord
+        modified = stringMap.priorWord
+        index = stringOrig.split(" ").indexOf(original)
+      } else if (type === "replaced") {
+        original = stringMap.priorWord + stringMap.currentWord
+        added = stringMap.followingWord
+        removed = stringMap.currentWord
+        modified = stringMap.priorWord + stringMap.followingWord
+        index = stringOrig.split(" ").indexOf(original)
+      }
+    return {original, removed, added, modified, index}
+  }
+
+  function modStartWord(stringMap, type) {
+    let original, removed, added, modified, index
+      if (type === "added") {
+        original = stringMap.followingWord
+        added = stringMap.currentWord
+        removed = null
+        modified = stringMap.currentWord + stringMap.followingWord
+        index = stringMod.split(" ").indexOf(modified)
+      } else if (type === "removed") {
+        original = stringMap.currentWord + stringMap.followingWord
+        added = null
+        removed = stringMap.currentWord
+        modified = stringMap.followingWord
+        index = stringOrig.split(" ").indexOf(original)
+      } else if (type === "replaced") {
+        original = stringMap.currentWord + stringMap.following2Word
+        added = stringMap.followingWord
+        removed = stringMap.currentWord
+        modified = stringMap.followingWord + stringMap.following2Word
+        index = stringOrig.split(" ").indexOf(original)
+      }
     return {original, removed, added, modified, index}
   }
 
