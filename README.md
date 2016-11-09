@@ -1,4 +1,4 @@
-### Diff/space logic has been updated to cover most modification cases needs refactor.
+### Diff/space logic has been updated to cover most modification cases.
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
